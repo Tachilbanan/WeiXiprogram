@@ -20,13 +20,5 @@ Page({
     //     //complete
     //   }
     // })
-  },
-
-  onUnload:function(){
-    console.log("onUnload");
-  },
-
-  onHide:function(){
-    console.log("welcome page is hide");
   }
 })
