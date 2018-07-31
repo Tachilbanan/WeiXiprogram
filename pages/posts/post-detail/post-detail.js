@@ -2,7 +2,7 @@ var postsData = require('../../../data/posts-data.js')
 
 Page({
   data: {
-
+    isPlayingMusic: false
   },
 
   onLoad: function(option) {
@@ -24,16 +24,32 @@ Page({
       postsCollected[postId] = false;
       wx.setStorageSync('posts_collected', postsCollected);
 
-    }
+    };
+
+    //监听播放，使页面上的播放与总控开关一致
+    var that = this;
+    wx.onBackgroundAudioPlay(function() {
+      that.setData({
+        isPlayingMusic: true
+      })
+    });
+
+    wx.onBackgroundAudioPause(function() {
+      that.setData({
+        isPlayingMusic: false
+      })
+    });
   },
 
+
+  //收藏按钮
   onColletionTap: function(event) {
     this.getPostCollectedSyc();
     // this.getPostCollectedAsy();
   },
 
   //异步调用
-  getPostCollectedAsy:function(){
+  getPostCollectedAsy: function() {
     var that = this;
     wx.getStorage({
       key: 'posts_collected',
@@ -49,7 +65,7 @@ Page({
   },
 
   //同步调用
-  getPostCollectedSyc:function(){
+  getPostCollectedSyc: function() {
     var postsCollected = wx.getStorageSync('posts_collected');
     var postCollected = postsCollected[this.data.currentPostId];
     //收藏变成未收藏，未收藏变成收藏
@@ -98,6 +114,8 @@ Page({
     })
   },
 
+
+  //分享按钮功能（目前暂不能实现）
   onShareTap: function(event) {
     var itemList = [
       "分享给微信好友",
@@ -105,7 +123,7 @@ Page({
       "分享给QQ好友",
       "分享到QQ空间",
       "分享到微博",
-    ]
+    ];
     // wx.showActionSheet({
     //   itemList: [
     //     "分享给微信好友",
@@ -128,4 +146,26 @@ Page({
       }
     })
   },
+
+  //音乐播放按钮功能
+  onMusicTap: function(event) {
+    var currentPostId = this.data.currentPostId;
+    var postData = postsData.postList[currentPostId].music;
+    var isPlayingMusic = this.data.isPlayingMusic;
+    if (isPlayingMusic) {
+      wx.pauseBackgroundAudio();
+      this.setData({
+        isPlayingMusic: false
+      })
+    } else {
+      wx.playBackgroundAudio({
+        dataUrl: postData.dataUrl,
+        title: postData.title,
+        coverImgUrl: postData.coverImgUrl,
+      })
+      this.setData({
+        isPlayingMusic: true
+      })
+    }
+  }
 })
