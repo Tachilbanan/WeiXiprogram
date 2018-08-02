@@ -1,8 +1,8 @@
 var postsData = require('../../../data/posts-data.js')
-
+var app = getApp();
 Page({
   data: {
-    isPlayingMusic: false
+    isPlayingMusic: false,
   },
 
   onLoad: function(option) {
@@ -10,6 +10,7 @@ Page({
     this.data.currentPostId = postId;
     var postData = postsData.postList[postId];
     this.setData(postData);
+
 
     var postsCollected = wx.getStorageSync('posts_collected')
     if (postsCollected) {
@@ -25,22 +26,34 @@ Page({
       wx.setStorageSync('posts_collected', postsCollected);
 
     };
+    //用全局变量控制音乐状态
+    if (app.globalData.g_isPlayingMusic && app.globalData.g_currentMusicPostId === postId) {
+      this.setData({
+        isPlayingMusic: true,
+      })
+    }
+    this.setMusicMonitor();
+  },
 
+  setMusicMonitor: function() {
     //监听播放，使页面上的播放与总控开关一致
     var that = this;
     wx.onBackgroundAudioPlay(function() {
       that.setData({
         isPlayingMusic: true
       })
+      app.globalData.g_isPlayingMusic = true;
+      app.globalData.g_currentMusicPostId = that.data.currentPostId;
     });
 
     wx.onBackgroundAudioPause(function() {
       that.setData({
         isPlayingMusic: false
       })
+      app.globalData.g_isPlayingMusic = false;
+      app.globalData.g_currentMusicPostId = null;
     });
   },
-
 
   //收藏按钮
   onColletionTap: function(event) {
