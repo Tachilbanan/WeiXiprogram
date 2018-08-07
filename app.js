@@ -4,5 +4,7 @@ App({
     g_isPlayingMusic:false,
     //定义一个全局变量去控制页面ID
     g_currentMusicPostId:null,
+    //定义豆瓣全局变量地址
+    doubanBase:"https://douban.uieee.com",
   }
 })
