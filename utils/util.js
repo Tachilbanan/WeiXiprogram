@@ -11,6 +11,24 @@ function convertToStarsArray(stars) {
   return array;
 }
 
+function http(url, callBack) {
+  //获取豆瓣数据
+  wx.request({
+    url: url,
+    method: 'GET',
+    header: {
+      "Content-Type": "application/xml"
+    },
+    success: function(res) {
+      callBack(res.data)
+    },
+    fail: function() {
+      console.log("failed")
+    }
+  })
+}
+
 module.exports = {
-  convertToStarsArray:convertToStarsArray,
+  convertToStarsArray: convertToStarsArray,
+  http: http
 }

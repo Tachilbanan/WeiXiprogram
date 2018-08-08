@@ -19,6 +19,13 @@ Page({
     this.getMovieListDate(top250Url, "top250", "TOP250");
   },
 
+  onMoreTap:function(event){
+    var category = event.currentTarget.dataset.category;
+    wx.navigateTo({
+      url: 'more-movie/more-movie?category='+category,
+    })
+  },
+
   getMovieListDate: function (url, settedKey, categoryTitle) {
     var that = this;
     //获取豆瓣数据
@@ -63,4 +70,6 @@ Page({
     };
     this.setData(readyData);
   }
+
+
 })
