@@ -22,7 +22,7 @@ function http(url, callBack) {
     success: function(res) {
       callBack(res.data)
     },
-    fail: function() {
+    fail: function(error) {
       console.log("failed")
     }
   })

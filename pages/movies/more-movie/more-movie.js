@@ -1,11 +1,16 @@
-var util = require('../../../utils/util.js');
 var app = getApp();
+var util = require('../../../utils/util.js');
+
 // pages/movies/more-movie/more-movie.js
 Page({
   data: {
-    movies:{},
+    movies: {},
     navigateTitle: "",
+    requestUrl: "",
+    totalCount: 0,
+    isEmpty: true,
   },
+
   onLoad: function(options) {
     var category = options.category;
     this.data.navigateTitle = category;
@@ -22,10 +27,32 @@ Page({
         dataUrl = app.globalData.doubanBase + "/v2/movie/top250";
         break;
     }
-    util.http(dataUrl, this.callBack)
+    this.data.requestUrl = dataUrl;
+    util.http(dataUrl, this.processDoubanData)
   },
 
-  processDoubanData: function (moviesDouban) {
+  //上划加载更多
+  // onScrollLower: function(event) {
+  //   var nextUrl = this.data.requestUrl + "?start=" + this.data.totalCount + "&count=20";
+  //   util.http(nextUrl, this.processDoubanData)
+  //   wx.showNavigationBarLoading()
+  // },
+
+  onReachBottom: function(event) {
+    var nextUrl = this.data.requestUrl + "?start=" + this.data.totalCount + "&count=20";
+    util.http(nextUrl, this.processDoubanData)
+    wx.showNavigationBarLoading()
+  },
+
+  onPullDownRefresh: function(event) {
+    var refreshUrl = this.data.requestUrl + "?start=0&count=20";
+    this.data.movies = {};
+    this.data.isEmpty = true;
+    util.http(refreshUrl, this.processDoubanData);
+    wx.showNavigationBarLoading()
+  },
+
+  processDoubanData: function(moviesDouban) {
     var movies = [];
     //获取到的数据填充
     for (var idx in moviesDouban.subjects) {
@@ -43,18 +70,25 @@ Page({
       }
       movies.push(temp)
     }
-    this.setData({
-      movies: movies
-    });
-  }
-},
-
-onReady: function(event) {
-  wx.setNavigationBarTitle({
-    title: this.data.navigateTitle,
-    success: function(res) {
-
+    var totalMovies = {};
+    //如果绑定新加载的数据需要从旧有的数据合并在一起
+    if (!this.data.isEmpty) {
+      totalMovies = this.data.movies.concat(movies);
+    } else {
+      totalMovies = movies;
+      this.data.isEmpty = false;
     }
-  })
-}
+    this.setData({
+      movies: totalMovies
+    });
+    this.data.totalCount += 20;
+    wx.hideNavigationBarLoading();
+    wx.stopPullDownRefresh();
+  },
+
+  onReady: function(event) {
+    wx.setNavigationBarTitle({
+      title: this.data.navigateTitle,
+    })
+  }
 })
