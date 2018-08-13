@@ -6,7 +6,10 @@ Page({
   data: {
     inTheaters: {},
     comingSoon: {},
-    top250: {}
+    top250: {},
+    searchResult: {},
+    containerShow: true,
+    searchPanelShow: false,
   },
 
   onLoad: function(event) {
@@ -19,14 +22,21 @@ Page({
     this.getMovieListDate(top250Url, "top250", "TOP250");
   },
 
-  onMoreTap:function(event){
+  onMoreTap: function(event) {
     var category = event.currentTarget.dataset.category;
     wx.navigateTo({
-      url: 'more-movie/more-movie?category='+category,
+      url: 'more-movie/more-movie?category=' + category,
     })
   },
 
-  getMovieListDate: function (url, settedKey, categoryTitle) {
+  onMovieTap:function(event){
+    var movieId = event.currentTarget.dataset.movieid;
+    wx.navigateTo({
+      url: 'movie-detail/movie-detail?id=' + movieId
+    })
+  },
+
+  getMovieListDate: function(url, settedKey, categoryTitle) {
     var that = this;
     //获取豆瓣数据
     wx.request({
@@ -44,7 +54,28 @@ Page({
     })
   },
 
-  processDoubanData: function (moviesDouban, settedKey, categoryTitle) {
+  onCancelImgTap: function(event) {
+    this.setData({
+      containerShow: true,
+      searchPanelShow: false,
+      searchResult: {},
+    })
+  },
+
+  onBindFocus: function(event) {
+    this.setData({
+      containerShow: false,
+      searchPanelShow: true,
+    })
+  },
+
+  onBindConfirm: function(event) {
+    var text = event.detail.value;
+    var searcUrl = app.globalData.doubanBase + "/v2/movie/search?q=" + text;
+    this.getMovieListDate(searcUrl, "searchResult", "")
+  },
+
+  processDoubanData: function(moviesDouban, settedKey, categoryTitle) {
     //定义一个空数组存放数据
     var movies = [];
     //获取到的数据填充
