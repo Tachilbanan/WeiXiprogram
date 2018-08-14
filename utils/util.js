@@ -33,7 +33,7 @@ function convertToCastString(casts) {
   for (var idx in casts) {
     castsjoin = castsjoin + casts[idx].name + "/";
   }
-  return castsjoin.substring(0, castsjoin.length - 2);
+  return castsjoin.substring(0, castsjoin.length - 1);
 }
 
 function convertToCastInfos(casts) {

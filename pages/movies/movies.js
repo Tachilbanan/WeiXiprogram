@@ -101,6 +101,4 @@ Page({
     };
     this.setData(readyData);
   }
-
-
 })
